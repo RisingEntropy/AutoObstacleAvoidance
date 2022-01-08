@@ -43,6 +43,6 @@ public class Path implements Comparable<Path>{
 
     @Override
     public int compareTo(Path path) {
-        return Integer.compare(-this.length, -path.getLength());//方便小根堆
+        return Integer.compare(this.length, path.getLength());//方便小根堆
     }
 }

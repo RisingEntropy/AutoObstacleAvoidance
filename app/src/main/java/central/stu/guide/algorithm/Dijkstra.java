@@ -46,7 +46,6 @@ public class Dijkstra {
             queue.poll();
             int currPoint = top.getCurr();//一定不为null
             vis[currPoint] = false;
-            Log.e("Dijkstra",String.format("point:%d dis:%d ",currPoint,paths[currPoint].getLength()));
             for(int i = graph.getHead(currPoint);i!=0;i = graph.getEdge(i).getNext()){
                 Edge edge = graph.getEdge(i);
 

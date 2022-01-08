@@ -19,7 +19,7 @@ public class ProcessPic {
     public static final int baseWidth = 30;
     public static final int baseHeight = 30;//100X100作为单位判断
     public static final int groupPerTest = 30;//每个块取30个点
-    public static final int groupTestPass = 28;//有28个点是路就过
+    public static final int groupTestPass = 25;//有28个点是路就过
     public ProcessPic(Bitmap bitmap){
         this.bitmap = bitmap;
         this.random = new Random(System.currentTimeMillis());
@@ -33,18 +33,15 @@ public class ProcessPic {
         for(int i = 1;i<rowCnt;i++){//四周不看
             for(int j = 2;j<colCnt;j++){
                 int idx = i*colCnt+j;
-                int startX = baseWidth*(idx%colCnt);
-                int startY = baseHeight*(idx/rowCnt);
                 if(!judgeUniteValid(idx)){
                     continue;//这一块不是路，不建图
                 }else{
 
-                    if(judgeUniteValid(idx+1))graph.addEdge(idx,idx+1,1);//右边
-                    if(judgeUniteValid(idx-1))graph.addEdge(idx,idx-1,1);//左边
-                    if(judgeUniteValid(idx-colCnt)){
-
-                        graph.addEdge(idx,idx-colCnt,1);//上面块
-                    }
+                    if(judgeUniteValid(idx+1))graph.addEdge(idx,idx+1,1000);//右边
+                    if(judgeUniteValid(idx-1))graph.addEdge(idx,idx-1,1000);//左边
+                    if(judgeUniteValid(idx-colCnt)) graph.addEdge(idx,idx-colCnt,1);//上面块
+                    if(judgeUniteValid(idx-colCnt-1)) graph.addEdge(idx,idx-colCnt-1,3);//左上面块
+                    if(judgeUniteValid(idx-colCnt+1)) graph.addEdge(idx,idx-colCnt+1,3);//右上面块
                 }
             }
         }
@@ -65,7 +62,6 @@ public class ProcessPic {
         }
     }
     public Bitmap process(){
-//        Bitmap bitmap = Bitmap.createBitmap();
         Canvas canvas = new Canvas(this.bitmap);
         Dijkstra dijkstra = new Dijkstra(graph);
         dijkstra.startAlgorithm(startIdx);
@@ -76,17 +72,14 @@ public class ProcessPic {
         paint.setStrokeWidth(10);
         paint.setAntiAlias(true);
         if(path==null){
-
             Log.e("Process","null");
             return bitmap;
         }
         List<Integer> pathPoints = path.getPath();
         int last = pathPoints.get(0);
-        Log.e("Process",Integer.toString(last));
         for(int i = 1;i<pathPoints.size();i++){
             drawLineBetweenBlock(last,pathPoints.get(i),canvas,paint);
             last = pathPoints.get(i);
-            Log.e("Process",Integer.toString(last));
         }
         return bitmap;
     }
@@ -100,7 +93,6 @@ public class ProcessPic {
         canvas.drawLine(idx1X,idx1Y,idx2X,idx2Y,paint);
     }
     private boolean judgeUniteValid(int point){
-        //因为编号从1开始，但是取块的时候是从0开始，所以需要减
         int startX = baseWidth*(point%colCnt);
         int startY = baseHeight*(point/colCnt);
         int valCnt = 0;
